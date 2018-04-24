@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon -e html,js,css app.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,9 @@
     "body-parser": "^1.18.2",
     "express": "^4.16.3",
     "nunjucks": "^3.1.2",
+    "pg": "^7.4.1",
+    "psql": "0.0.1",
+    "sequelize": "^4.37.6",
     "volleyball": "^1.4.1"
   }
 }
