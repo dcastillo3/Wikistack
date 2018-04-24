@@ -2,8 +2,8 @@ const express = require('express');
 const nunjucks = require('nunjucks');
 const bodyParser = require('body-parser');
 const pg = require('pg');
-const Sequalize = require('sequelize');
-const db = new Sequalize('postgres://localhost:5432/wikistack');
+const Sequelize = require('sequelize');
+const db = new Sequelize('postgres://localhost:5432/wikistack');
 const app = express();
 
 app.set('view engine', 'html');
@@ -17,5 +17,20 @@ app.get('/', function(req, res, next) {
         title: 'Wikistacks',
     });
 });
+
+const Page = db.define('page', {
+    title: {type: Sequelize.STRING, allowNull: false, defaultValue: 'Wikipage'},
+    urltitle: {type: Sequelize.STRING, allowNull: false, defaultValue: 'Wikipage'},
+    content: {type: Sequelize.TEXT},
+    status: {type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false}
+});
+
+const User = db.define('user', {
+    name: {type: Sequelize.STRING, allowNull: false},
+    email: {type: Sequelize.STRING, allowNull: false}
+});
+
+Page.sync();
+User.sync();
 
 app.listen('3000');
