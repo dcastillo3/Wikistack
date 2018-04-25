@@ -1,16 +1,28 @@
 const express = require('express');
 const nunjucks = require('nunjucks');
 const bodyParser = require('body-parser');
+const chalk = require('chalk');
 const pg = require('pg');
 const Sequelize = require('sequelize');
-const db = new Sequelize('postgres://localhost:5432/wikistack');
+const db = new Sequelize('postgres://localhost:5432/wikistack', {
+    logging: false
+});
 const app = express();
+const models = require('./models');
+// const router = require('./routes');
 
 app.set('view engine', 'html');
 app.engine('html', nunjucks.render);
 nunjucks.configure('views', {noCache: true});
 app.use(express.static('public'));
-// const routes = require('../routes');
+const router = require('./routes');
+
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(router);
+
+
 
 app.get('/', function(req, res, next) {
     res.render('index', {
@@ -18,19 +30,15 @@ app.get('/', function(req, res, next) {
     });
 });
 
-const Page = db.define('page', {
-    title: {type: Sequelize.STRING, allowNull: false, defaultValue: 'Wikipage'},
-    urltitle: {type: Sequelize.STRING, allowNull: false, defaultValue: 'Wikipage'},
-    content: {type: Sequelize.TEXT},
-    status: {type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false}
-});
-
-const User = db.define('user', {
-    name: {type: Sequelize.STRING, allowNull: false},
-    email: {type: Sequelize.STRING, allowNull: false}
-});
-
-Page.sync();
-User.sync();
-
-app.listen('3000');
+models.Page.sync().then(() => {
+    // Table created
+    console.log(chalk.green('Page table created'));
+    return models.User.sync();
+})
+.then(function () {
+    console.log(chalk.green('User table created'));
+    app.listen('3000', function () {
+        console.log('Server is listening on port 3000');
+    });
+})
+.catch(console.error.bind(console));
